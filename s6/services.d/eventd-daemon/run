@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv sh
+
+cd /usr/share/app
+exec python daemon.py
