@@ -1,3 +1,3 @@
-from eventd.daemon import main
+from eventd.daemon import entry
 
-input()
+entry.entry()

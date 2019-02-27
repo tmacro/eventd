@@ -1,7 +1,9 @@
 from ..common.schedule import RedisScheduler
 from gabcommon.redis import RedisStorageEngine
+from gabcommon.log import Log
 import requests
 
+_log = Log('emitter')
 
 class EventEmitter(RedisStorageEngine):
     def _emit_webhook(self, url=None, data=None, method='POST'):
@@ -14,13 +16,18 @@ class EventEmitter(RedisStorageEngine):
         self.publish(channel, data if data is not None else '')
 
     def emit(self, conf):
-        print('Got event %s'%str(conf))
-        if 'webhook' in conf:
-            self._emit_webhook(**conf['webhook'])
-        else:
-            self._emit_redis(**conf)
+        _log.debug('Got event %s'%str(conf))
+        try:
+            if 'webhook' in conf:
+                self._emit_webhook(**conf['webhook'], data=conf.get('payload'))
+            else:
+                self._emit_redis(**conf)
+        except Exception:
+            pass
 
-event_emitter = EventEmitter()
-scheduler = RedisScheduler()
 
-scheduler.start(event_emitter.emit)
+def watch_events():
+    event_emitter = EventEmitter()
+    scheduler = RedisScheduler()
+    for event in scheduler.events:
+        event_emitter.emit(event)

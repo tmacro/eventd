@@ -1,3 +1,5 @@
-#!/bin/sh
+#!/usr/bin/with-contenv sh
 
-sleep 10000
+cd /usr/share/app
+
+exec gunicorn eventd.api.wsgi --bind 0.0.0.0:80 --log-file -
