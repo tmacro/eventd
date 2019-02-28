@@ -3,6 +3,7 @@ import logging
 import pprint
 import json
 from ..common.schedule import RedisScheduler
+from ..common.types import Event
 
 class URLVerificationHandler:
 	def on_post(self, req, resp):
@@ -27,19 +28,16 @@ class BaseEventSchedule:
 
 class EventCreate(BaseEventSchedule):
     def on_post(self, req, resp): # Create a new timer
-        delay = req.media.get('delay')
-        repeat = req.media.get('repeat', False)
-        payload = {}
-        if 'payload' in req.media:
-            payload['payload'] = req.media.get('payload')
-        if 'webhook' in req.media:
-            payload['webhook'] = req.media.get('webhook')
-        event_id = self._sched.schedule(delay, payload, repeat)
+        event_data = req.media.copy()
+        event_data['type'] = 'webhook' if 'url' in req.media else 'redis'
+        event_data['repeat'] = req.media.get('repeat', False)
+        event = Event(**event_data)
+        self._sched.schedule(event)
         resp_body = {
-            "id": event_id,
+            "id": event.id,
             "ok": True,
-            "cancel": "/eventd/v1/events/%s"%event_id,
-            "update": "/eventd/v1/events/%s"%event_id,
+            "cancel": "/eventd/v1/events/%s"%event.id,
+            "update": "/eventd/v1/events/%s"%event.id,
             "error": None
         }
         resp.body = json.dumps(resp_body)

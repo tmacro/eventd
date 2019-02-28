@@ -2,6 +2,8 @@ import logging
 from .handlers import BaseEventSchedule
 from .schema import EVENT_SCHEMA
 import jsonschema
+from jsonschema.exceptions import ValidationError
+import falcon
 
 class RIPTerryPratchett:
 	def process_response(self, req, resp, resource, req_succeeded):
@@ -11,5 +13,9 @@ class SchemaValidator:
     def process_resource(self, req, resp, resource, params):
         if isinstance(resource, BaseEventSchedule):
             if req.method == 'POST' or req.method == 'PATCH':
-                if not jsonschema.validate(req.media, EVENT_SCHEMA):
-                    print('failed validation')
+                try:
+                    jsonschema.validate(req.media, EVENT_SCHEMA)
+                except ValidationError as err:
+                    raise falcon.HTTPBadRequest(
+                        description=err.message
+                    )

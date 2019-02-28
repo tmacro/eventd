@@ -11,11 +11,10 @@
 ```
 {
     "delay": 5, # How many seconds to wait before triggering
-    "webhook": { # Optional, specify a webhook to call on event
-        "url": "https://example.com",
-        "method": "POST" # Optional, specify the HTTP method
-    },
-    "payload": null, # Optional, include a text http payload for webhook/pubsub
+    "channel": null,
+    "url": "https://example.com", # Optional, specify a webhook to call on event
+    "method": "POST" # Optional, specify the HTTP method
+    "data": null, # Optional, include a payload for webhook/pubsub
     "repeat": false  # Whether to repeat the event
 }
 ```
