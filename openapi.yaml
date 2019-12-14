@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  description: A RESTful scheduling service utilizing redis as its backing store.
+  title: eventd
+  version: 0.0.1
+
+components:
+  schemas: 
+    event:
+      type: object
+      required: [ type, url, method, delay]
+      properties:
+        type:
+          type: string
+          enum:
+            - webhook
+        data:
+          type: string
+        url:
+          type: string
+        method:
+          type: string
+          enum:
+            - GET
+            - POST
+        delay:
+          type: integer
+        repeat:
+          type: boolean
+  responses: {}
+  parameters:
+    event_id:
+      in: path
+      name: event_id
+      required: True
+      schema:
+        type: string
+paths:
+  /event:
+    post:
+      x-router-controller: Event
+      operationId: createEvent
+      requestBody:
+        x-name: body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/event'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ event_id ]
+                properties:
+                  event_id:
+                    type: string
+  /event/{event_id}:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+    get:
+      x-router-controller: Event
+      operationId: getEvent
+      responses:
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event'
+        '404':
+          description: Not Found
+    delete:
+      x-router-controller: Event
+      operationId: cancelEvent
+      responses:
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                    enum:
+                      - true
+                  event_id:
+                    type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                    enum:
+                      - false
+                  event_id:
+                    type: string
+      

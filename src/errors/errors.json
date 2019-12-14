@@ -1,0 +1,10 @@
+{
+    "NotImplemented": {
+        "code": 501,
+        "description": "This operation has yet to be implemented."
+    },
+    "InternalError": {
+        "code": 500,
+        "description": "The server encountered an internal error. Please retry the request."
+    }
+}
