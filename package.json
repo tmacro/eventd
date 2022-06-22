@@ -9,7 +9,7 @@
     },
     "dependencies": {
         "@hapi/joi": "^16.1.8",
-        "async": "^3.1.0",
+        "async": "^3.2.2",
         "ioredis": "^4.14.1",
         "js-yaml": "^3.13.1",
         "oas-tools": "^2.1.7",
